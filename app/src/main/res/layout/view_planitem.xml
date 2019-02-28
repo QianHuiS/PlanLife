@@ -27,16 +27,18 @@
             android:textSize="14sp" />
 
         <Button
-            android:id="@+id/bt_planadd"
+            android:id="@+id/bt_workadd"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:text="+" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_plans"
+        android:id="@+id/ll_works"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:orientation="vertical" >
+
+    </LinearLayout>
 
 </LinearLayout>

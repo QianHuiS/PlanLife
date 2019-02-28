@@ -27,6 +27,51 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //開啟DB
+        mSQLiteDatabase = this.openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
+
+        //清除Table
+        String DROP_TABLE;
+        DROP_TABLE=  "DROP TABLE IF EXISTS "+ WorkItem.table_work;
+        DROP_TABLE=  "DROP TABLE IF EXISTS "+ PlanItem.table_plan;
+        //mSQLiteDatabase.execSQL(DROP_TABLE);
+
+        //建Table
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " +  //建立表單(若表單不存在!!). 建錯移除app.
+                WorkItem.table_work +" (" +
+                WorkItem.work_id +" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                WorkItem.work_previous +" TEXT, " +
+                WorkItem.work_next +" TEXT, " +
+                WorkItem.work_name +" TEXT, " +
+                WorkItem.work_content +" TEXT, " +
+                WorkItem.work_type +" TEXT, " +
+                WorkItem.work_completion +" TEXT, " +
+                WorkItem.work_deadline +" TEXT )";
+        mSQLiteDatabase.execSQL(CREATE_TABLE);     //執行SQL指令的字串.
+
+        CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " +  //建立表單(若表單不存在!!). 建錯移除app.
+                PlanItem.table_plan +" (" +
+                PlanItem.plan_id +" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                PlanItem.plan_part +" TEXT, " +
+                PlanItem.plan_works +" TEXT, " +
+                PlanItem.plan_date +" TEXT )";
+        mSQLiteDatabase.execSQL(CREATE_TABLE);     //執行SQL指令的字串.
+
+        String INSERT_TABLE;
+        INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
+                PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
+                "VALUES('起床後', '', '')";
+        mSQLiteDatabase.execSQL(INSERT_TABLE);
+        INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
+                PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
+                "VALUES('午餐後', '', '')";
+        mSQLiteDatabase.execSQL(INSERT_TABLE);
+        INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
+                PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
+                "VALUES('晚餐後', '', '')";
+        mSQLiteDatabase.execSQL(INSERT_TABLE);
+
+
         //XML
         iv_loading = findViewById(R.id.iv_loading);
 
@@ -41,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try{
-                    Thread.sleep(5000);     //延遲N秒. (N秒=N*1000毫秒)
+                    Thread.sleep(2000);     //延遲N秒. (N秒=N*1000毫秒)
                     //切換頁面
                     startActivity(
                             new Intent().setClass(MainActivity.this, DayplanActivity.class));
