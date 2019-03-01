@@ -1,6 +1,7 @@
 package tw.idv.qianhuis.planlife;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.AnimationDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         //清除Table
         String DROP_TABLE;
         DROP_TABLE=  "DROP TABLE IF EXISTS "+ WorkItem.table_work;
+        //mSQLiteDatabase.execSQL(DROP_TABLE);
         DROP_TABLE=  "DROP TABLE IF EXISTS "+ PlanItem.table_plan;
         //mSQLiteDatabase.execSQL(DROP_TABLE);
 
@@ -57,20 +59,24 @@ public class MainActivity extends AppCompatActivity {
                 PlanItem.plan_date +" TEXT )";
         mSQLiteDatabase.execSQL(CREATE_TABLE);     //執行SQL指令的字串.
 
-        String INSERT_TABLE;
-        INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
-                PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
-                "VALUES('起床後', '', '')";
-        mSQLiteDatabase.execSQL(INSERT_TABLE);
-        INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
-                PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
-                "VALUES('午餐後', '', '')";
-        mSQLiteDatabase.execSQL(INSERT_TABLE);
-        INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
-                PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
-                "VALUES('晚餐後', '', '')";
-        mSQLiteDatabase.execSQL(INSERT_TABLE);
-
+        Cursor c;
+        c= mSQLiteDatabase.rawQuery("SELECT * FROM "+ PlanItem.table_plan +" WHERE 1", null);
+        c.moveToFirst();
+        if(c.getCount()==0) {
+            String INSERT_TABLE;
+            INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
+                    PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
+                    "VALUES('起床後', '', '')";
+            mSQLiteDatabase.execSQL(INSERT_TABLE);
+            INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
+                    PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
+                    "VALUES('午餐後', '', '')";
+            mSQLiteDatabase.execSQL(INSERT_TABLE);
+            INSERT_TABLE = "INSERT INTO "+PlanItem.table_plan+" ("+
+                    PlanItem.plan_part +", " + PlanItem.plan_works +", " + PlanItem.plan_date +" ) " +
+                    "VALUES('晚餐後', '', '')";
+            mSQLiteDatabase.execSQL(INSERT_TABLE);
+        }
 
         //XML
         iv_loading = findViewById(R.id.iv_loading);
@@ -86,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try{
-                    Thread.sleep(2000);     //延遲N秒. (N秒=N*1000毫秒)
+                    Thread.sleep(1000);     //延遲N秒. (N秒=N*1000毫秒)
                     //切換頁面
                     startActivity(
                             new Intent().setClass(MainActivity.this, DayplanActivity.class));

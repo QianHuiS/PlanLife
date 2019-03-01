@@ -21,6 +21,8 @@ public class WorkItem {
     private String completion;
     private String deadline;
 
+    public WorkItem() {}
+
     public WorkItem(String id, String previous, String next,
                     String name, String content, String type,
                     String completion, String deadline) {
@@ -128,6 +130,11 @@ public class WorkItem {
 
     public static String deleteTable(WorkItem wi) {
         String DELETE_TABLE= "DELETE FROM "+ table_work +" WHERE "+ work_id +"=" +wi.getId();
+        return DELETE_TABLE;
+    }
+
+    public static String deleteTable(String wiId) {
+        String DELETE_TABLE= "DELETE FROM "+ table_work +" WHERE "+ work_id +"=" +wiId;
         return DELETE_TABLE;
     }
 }

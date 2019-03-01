@@ -1,11 +1,12 @@
 package tw.idv.qianhuis.planlife;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,12 +14,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -56,43 +54,30 @@ public class DayplanDialog extends Dialog {
         LayoutInflater li= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View alertView= li.inflate(R.layout.dialog_ddworkadd, null);
 
-        Button bt_dismiss= alertView.findViewById(R.id.bt_dismiss);
-        bt_dismiss.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-
         final Button bt_deadline= alertView.findViewById(R.id.bt_deadline);
         bt_deadline.setTag("");
         bt_deadline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-                Calendar calendar= Calendar.getInstance(); //取得一個日曆實體.
 
-                DatePickerDialog datePickerDialog= new DatePickerDialog(
-                        context, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {  //month要+1.
-                        String sdate= DateFunction.stringFormat(year, month+1, day);
-                        bt_deadline.setText(sdate);
-                        Toast.makeText(context, sdate, Toast.LENGTH_SHORT).show();
-                    }
-                },
-                        calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
-                );
-                datePickerDialog.show();
-                */
                 if(bt_deadline.getTag().equals("")) {   //若已選擇過日期, 再次點選擇取消選擇.
-                    DateFunction df= new DateFunction();
-                    bt_deadline.setText(df.dateSelection(context));
-                    bt_deadline.setTag("1");
+                    //開啟日期選窗
+                    final DateFunction df= new DateFunction();
+                    df.dateSelection(context).setOnDismissListener(new OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            if(!df.getRcontent().equals("")) {
+                                bt_deadline.setText(df.getRcontent());
+                                Log.d("after dialog", "df.getRcontent()= "+df.getRcontent());
+                                Log.d("after dialog", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                                bt_deadline.setTag("1");
+                            }
+                        }
+                    });
                 } else {
+                    Log.d("befor cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
                     bt_deadline.setText("");
+                    Log.d("after cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
                     bt_deadline.setTag("");
                 }
             }
@@ -108,31 +93,32 @@ public class DayplanDialog extends Dialog {
                 WorkItem wi= new WorkItem(null,null,null,
                         et_name.getText().toString(), et_content.getText().toString(),
                         null, "", bt_deadline.getText().toString());
+                Log.d("befor insert", "bt.getText().toString()= "+bt_deadline.getText().toString());
 
-                //檢查事件名稱是否重複
-                Cursor c;
-                String WHERE= WorkItem.work_name +" = '" +wi.getName() +"'";
-                c = mSQLiteDatabase.rawQuery("SELECT * FROM "+ WorkItem.table_work +
-                        " WHERE "+WHERE, null);
+                if(!wi.getName().equals("")) {  //若名稱不為空.
+                    //檢查事件名稱是否重複
+                    Cursor c;
+                    String WHERE= WorkItem.work_name +" = '" +wi.getName() +"'";
+                    c = mSQLiteDatabase.rawQuery("SELECT * FROM "+ WorkItem.table_work +
+                            " WHERE "+WHERE, null);
 
-                if(c.getCount()==0) {   //若無重複名稱.
-                    c.close();
-                    if(!rcontent.equals("")) {  //若名稱不為空.
+                    if(c.getCount()==0) {   //若無重複名稱.
+                        c.close();
                         mSQLiteDatabase.execSQL(WorkItem.insertTable(wi));
                         Toast.makeText(context, "新增成功!!", Toast.LENGTH_SHORT).show();
                         rcontent= wi.getName();
                         dismiss();
-                    } else { Toast.makeText(context, "名稱為空白!!", Toast.LENGTH_SHORT).show(); }
 
-                } else {
-                    c.close();
-                    Toast.makeText(context, "名稱重複!", Toast.LENGTH_SHORT).show();
-                }
+                    } else {
+                        c.close();
+                        Toast.makeText(context, "名稱重複!", Toast.LENGTH_SHORT).show();
+                    }
+                } else { Toast.makeText(context, "名稱為空白!!", Toast.LENGTH_SHORT).show(); }
             }
         });
 
         setContentView(alertView);
-        setAlertWindow(0.8, 0.6, false);
+        setAlertWindow(0.9, 0.8, true);
     }
 
     public void buildWorkDelete(final WorkItem wi) {
@@ -152,7 +138,7 @@ public class DayplanDialog extends Dialog {
             }
         });
 
-        alertView.findViewById(R.id.bt_dismiss).setOnClickListener(new View.OnClickListener() {
+        alertView.findViewById(R.id.bt_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();

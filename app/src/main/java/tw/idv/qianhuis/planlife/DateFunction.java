@@ -110,7 +110,7 @@ public class DateFunction {
         return distance;
     }
 
-    public String dateSelection(final Context context) {
+    public DatePickerDialog dateSelection(final Context context) {
         Calendar calendar= Calendar.getInstance(); //取得一個日曆實體.
 
         DatePickerDialog datePickerDialog= new DatePickerDialog(
@@ -118,7 +118,8 @@ public class DateFunction {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int day) {  //month要+1.
                 String sdate= DateFunction.stringFormat(year, month+1, day);
-                rcontent=sdate;
+                rcontent= sdate;
+                //Log.d("dateSelection", "sdate= "+sdate+" rcontent= "+rcontent);
                 Toast.makeText(context, sdate, Toast.LENGTH_SHORT).show();
             }
         },
@@ -127,7 +128,7 @@ public class DateFunction {
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
         datePickerDialog.show();
-        return rcontent;
+        return datePickerDialog;
     }
 
     //Getter&Setter

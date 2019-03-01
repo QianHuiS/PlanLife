@@ -1,5 +1,7 @@
 package tw.idv.qianhuis.planlife;
 
+import android.util.Log;
+
 public class PlanItem {
 
     public static final String table_plan = "table_plan";
@@ -55,7 +57,7 @@ public class PlanItem {
     public String getW(int w) {
         String work= "";
 
-        String tmp= works;  //works格式:
+        String tmp= works;  //works格式: XX_XX_...XX_XX
         int i= 0;
         while(tmp.contains("_")) {    //字串是否包含"_".
             if(i== w) {
