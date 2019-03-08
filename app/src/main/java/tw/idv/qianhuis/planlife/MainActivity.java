@@ -81,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
         //XML
         iv_loading = findViewById(R.id.iv_loading);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         //Loading動畫
         adLoading = (AnimationDrawable) iv_loading.getDrawable();
         adLoading.start();
@@ -101,9 +107,5 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
-
-        //開啟DB
-
-
     }
 }

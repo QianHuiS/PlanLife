@@ -94,84 +94,125 @@ public class DayplanActivity extends AppCompatActivity {
                 //顯示work的cb, 顯示確認/取消bt.
                 for(int i=0; i<ll_plans.getChildCount(); i++) {
                     View v_planitem= ll_plans.getChildAt(i);
+                    Button bt_workadd= v_planitem.findViewById(R.id.bt_workadd);
                     LinearLayout ll_works= v_planitem.findViewById(R.id.ll_works);
+
+                    //禁用btClick
+                    bt_workadd.setEnabled(false);
 
                     for(int j=0; j<ll_works.getChildCount(); j++) {
                         View v_workitem= ll_works.getChildAt(j);
                         Button bt_name= v_workitem.findViewById(R.id.bt_name);
-                        final CheckBox cb_check= v_workitem.findViewById(R.id.cb_check);
+                        CheckBox cb_check= v_workitem.findViewById(R.id.cb_check);
 
                         final WorkItem wi= selectWorkName(bt_name.getText().toString());
 
+                        //禁用btClick
+                        bt_name.setEnabled(false);
+
                         //顯示cb
                         cb_check.setVisibility(View.VISIBLE);
+                        cb_check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                if(isChecked) {    //勾選則加入刪除名單內.
+                                    String btTag= bt_ok.getTag().toString();
+                                    Log.d("itemOnClick before: ", "bt_okTag="+btTag);
 
+                                    //判斷是否位在第一個
+                                    if(btTag.equals("")) bt_ok.setTag(btTag.concat("_"+wi.getName()+"_"));
+                                    else bt_ok.setTag(btTag.concat(wi.getName()+"_"));
+                                    btTag= bt_ok.getTag().toString();
+                                    Log.d("itemOnClick after: ", "bt_okTag="+btTag);
+                                } else {  //未勾選則消除刪除名單.
+                                    String btTag= bt_ok.getTag().toString();
+                                    Log.d("itemOnClick before: ", "bt_okTag="+btTag);
+
+                                    bt_ok.setTag(btTag.replace("_"+wi.getName()+"_","_"));
+                                    btTag= bt_ok.getTag().toString();
+                                    if(btTag.equals("_")) bt_ok.setTag(""); //若為空則清空.
+                                    Log.d("itemOnClick after: ", "bt_okTag="+btTag);
+                                }
+                            }
+                        });
+/*
                         //點擊item時勾選cb
                         v_workitem.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if(cb_check.isChecked()) {  //已勾選則取消勾選, 消除刪除名單.
                                     String btTag= bt_ok.getTag().toString();
+                                    Log.d("itemOnClick before: ", "bt_okTag="+btTag);
 
-                                    //判斷是否位在第一個
-                                    if(!btTag.contains(" "+wi.getId()))
-                                        bt_ok.setTag(btTag.replace(wi.getId(),""));
-
-                                    else bt_ok.setTag(btTag.replace(" "+wi.getId(),""));
-
+                                    bt_ok.setTag(btTag.replace("_"+wi.getName()+"_","_"));
+                                    btTag= bt_ok.getTag().toString();
+                                    if(btTag.equals("_")) bt_ok.setTag(""); //若為空則清空.
+                                    Log.d("itemOnClick after: ", "bt_okTag="+btTag);
                                 } else {    //若無勾選, 加入刪除名單內.
                                     String btTag= bt_ok.getTag().toString();
+                                    Log.d("itemOnClick before: ", "bt_okTag="+btTag);
 
                                     //判斷是否位在第一個
-                                    if(btTag.equals("")) bt_ok.setTag(btTag.concat(wi.getId()));
-                                    else bt_ok.setTag(btTag.concat(" "+wi.getId()));
+                                    if(btTag.equals("")) bt_ok.setTag(btTag.concat("_"+wi.getName()+"_"));
+                                    else bt_ok.setTag(btTag.concat(wi.getName()+"_"));
+                                    btTag= bt_ok.getTag().toString();
+                                    Log.d("itemOnClick after: ", "bt_okTag="+btTag);
                                 }
 
                                 cb_check.toggle();  //toggle()為反向選擇.
                             }
                         });
-
+*/
                     }
                 }
 
                 bt_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String wiId= "";
-                        String tmp= bt_ok.getTag().toString();  //Tag格式: XX XX ...XX XX
+                        //String wiId= "";
+                        String tmp= bt_ok.getTag().toString();  //Tag格式: _XX_XX_..._XX_XX_
+                        Log.d("btokOnClick before: ", "bt_okTag="+tmp);
 
                         if(!tmp.equals("")) {
                             //刪除選取資料
-                            while(tmp.contains(" ")) {    //字串是否包含" ".
-                                wiId= wiId.concat(tmp.substring(0, tmp.indexOf(" ")));     //取得開始到第一個" "前的子字串.
-                                wiId= wiId.trim();
+                            while(tmp.contains("_")&& !tmp.equals("_")) {    //字串是否包含"_".
+                                WorkItem wi= selectWorkName(tmp.substring(1,
+                                        tmp.substring(1).indexOf("_")+1));    //取得第一個"_"後到第二個"_"前的子字串.
 
-                                WorkItem.deleteTable(wiId);
+                                //刪除wi
+                                mSQLiteDatabase.execSQL(    //更新PI.
+                                    WorkItem.deleteTable(wi)
+                                );
+                                //Log.d("btokOnClick ing: ", "WorkItem.deleteTable(wi)");
 
-                                wiId= "";
-                                tmp= tmp.substring(tmp.indexOf(" ")+1);   //tmp1= 第一個" "後, 到結尾的字串.
+                                //更新pi_works
+                                Cursor c1;
+                                c1= mSQLiteDatabase.rawQuery("SELECT * FROM "+ PlanItem.table_plan +" WHERE 1", null);
+                                c1.moveToFirst();
+                                while(!c1.isAfterLast()) {  //selectPlan 對應pi_works內包含wi者.
+                                    // TODO: 2019/3/8 若work可以在多個plan時段重名, 將會造成, 不知道該刪哪時段的work.
+                                    PlanItem pi = new PlanItem(
+                                            c1.getString(0), c1.getString(1),
+                                            c1.getString(2), c1.getString(3));
+                                    if(pi.getWorks().contains(wi.getName())) {
+                                        mSQLiteDatabase.execSQL(    //更新PI.
+                                            pi.removeWorks(wi.getName())
+                                        );
+                                        // TODO: 2019/3/8 若plan和work分開管理, 要確保work刪除時, 安全移除pi_works中的wi.
+                                        //Log.d("btokOnClick ing: ", "pi.removeWorks(wi.getName())");
+                                        c1.moveToLast();
+                                    }
+                                    c1.moveToNext();
+                                }
+                                c1.close();
+
+                                tmp= tmp.substring(tmp.substring(1).indexOf("_")+1);   //tmp= 第二個"_"前, 到結尾的字串.
+                                //Log.d("btokOnClick ing: ", "bt_okTag="+tmp);
                             }
-                            //剩最後一項(tmp沒有" ")
-                            wiId = wiId.concat(tmp).trim();
-
-                            WorkItem.deleteTable(wiId);
+                            //Log.d("btokOnClick after: ", "bt_okTag="+tmp);
 
                             //隱藏delete確認選項
                             ll_delete.setVisibility(View.GONE);
-
-                            for(int i=0; i<ll_plans.getChildCount(); i++) {
-                                View v_planitem = ll_plans.getChildAt(i);
-                                LinearLayout ll_works = v_planitem.findViewById(R.id.ll_works);
-
-                                for (int j = 0; j < ll_works.getChildCount(); j++) {
-                                    View v_workitem = ll_works.getChildAt(j);
-                                    CheckBox cb_check = v_workitem.findViewById(R.id.cb_check);
-
-                                    //隱藏cb
-                                    cb_check.setChecked(false);
-                                    cb_check.setVisibility(View.GONE);
-                                }
-                            }
 
                             //刷新
                             showPlans();
@@ -179,8 +220,6 @@ public class DayplanActivity extends AppCompatActivity {
                         } else Toast.makeText(context, "沒有選擇任何事件!", Toast.LENGTH_SHORT).show();
                     }
                 });
-                // TODO: 2019/3/2 Bug, ok後畫面未刷新? plan清單未刪? 已刪除DB但view還在.
-                // TODO: 2019/3/2 當進行刪除時, 禁止bt_name短按事件, 結束後回復.
 
                 bt_cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -188,19 +227,7 @@ public class DayplanActivity extends AppCompatActivity {
                         //隱藏delete確認選項
                         ll_delete.setVisibility(View.GONE);
 
-                        for(int i=0; i<ll_plans.getChildCount(); i++) {
-                            View v_planitem = ll_plans.getChildAt(i);
-                            LinearLayout ll_works = v_planitem.findViewById(R.id.ll_works);
-
-                            for (int j = 0; j < ll_works.getChildCount(); j++) {
-                                View v_workitem = ll_works.getChildAt(j);
-                                CheckBox cb_check = v_workitem.findViewById(R.id.cb_check);
-
-                                //隱藏cb
-                                cb_check.setChecked(false);
-                                cb_check.setVisibility(View.GONE);
-                            }
-                        }
+                        showPlans();
                     }
                 });
 
@@ -256,7 +283,8 @@ public class DayplanActivity extends AppCompatActivity {
                                             pi.addWorks(dd.getReturn())     //final的pi還是能以function修改內容.
                                     );
                                     Log.d("addworks", "pi.works= "+pi.getWorks());
-                                    showWorks(ll_works, pi);
+                                    //showWorks(ll_works, pi);
+                                    showPlans();
                                 }
                             }
                         });
@@ -291,7 +319,6 @@ public class DayplanActivity extends AppCompatActivity {
             bt_name.setText(wi.getName());
             tv_deadline.setText(wi.getDeadline());
 
-            // TODO: 2019/2/24 btplan短按事件, 開啟選擇事件.
             //短按標註完成
             bt_name.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -310,7 +337,7 @@ public class DayplanActivity extends AppCompatActivity {
                     }
                 }
             });
-
+/*
             //長按刪除事件
             bt_name.setOnLongClickListener(new View.OnLongClickListener() {     //長按移除.
                 @Override
@@ -325,7 +352,34 @@ public class DayplanActivity extends AppCompatActivity {
                                 mSQLiteDatabase.execSQL(    //更新PI.
                                         pi.removeWorks(dd.getReturn())
                                 );
-                                ll_works.removeView(v_workitem);
+                                //ll_works.removeView(v_workitem);
+                                showPlans();
+                            }
+                        }
+                    });
+                    return true;   //表只執行長按事件; 長按結束後不執行短按事件.
+                }
+            });
+*/
+
+            //長按顯示詳細資料
+            bt_name.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final DayplanDialog dd= new DayplanDialog(context);
+                    dd.buildWorkDetail(wi);
+                    dd.show();
+                    dd.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            if(!dd.getReturn().equals("")) {
+                                Log.d("reviseworks befor", "pi.works= "+pi.getWorks());
+                                mSQLiteDatabase.execSQL(    //更新PI.
+                                        pi.reviseWorks(dd.getReturn())     //final的pi還是能以function修改內容.
+                                );
+                                Log.d("reviseworks after", "pi.works= "+pi.getWorks());
+                                //showWorks(ll_works, pi);
+                                showPlans();
                             }
                         }
                     });
