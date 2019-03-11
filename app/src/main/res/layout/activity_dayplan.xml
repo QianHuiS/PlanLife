@@ -17,8 +17,8 @@
             android:orientation="vertical"
             android:paddingTop="50dp"
             android:paddingBottom="50dp"
-            android:paddingStart="30dp"
-            android:paddingEnd="30dp"/>
+            android:paddingStart="25dp"
+            android:paddingEnd="35dp"/>
     </ScrollView>
 
     <LinearLayout
@@ -75,7 +75,8 @@
                 android:layout_height="45dp"
                 android:layout_marginTop="5dp"
                 android:text="↑↓"
-                android:textSize="8sp" />
+                android:textSize="8sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/bt_delete"
@@ -90,13 +91,41 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_delete"
+        android:id="@+id/ll_move"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="100dp"
+        android:paddingEnd="10dp"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/bt_up"
+            android:layout_width="35dp"
+            android:layout_height="45dp"
+            android:text="↑"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/bt_down"
+            android:layout_width="35dp"
+            android:layout_height="45dp"
+            android:text="↓"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_check"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <Button
             android:id="@+id/bt_cancel"

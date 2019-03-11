@@ -30,10 +30,10 @@
         android:textSize="14sp" />
 
     <CheckBox
-        android:id="@+id/cb_check"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:visibility="gone" />
+    android:id="@+id/cb_check"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="0"
+    android:visibility="gone" />
 
 </LinearLayout>

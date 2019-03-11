@@ -65,7 +65,7 @@ public class PlanItem {
                 work= work.concat(tmp.substring(1,
                         tmp.substring(1).indexOf("_")+1));     //取得第一個"_"後到第二個"_"前的子字串.
                 work= work.trim();
-                Log.d("getW: loop"+i+" concat after", "work="+work);
+                //Log.d("getW: loop"+i+" concat after", "work="+work);
             }
             i++;
             //Log.d("getW: loop"+i+" tmp befor", "tmp="+tmp);
@@ -73,7 +73,7 @@ public class PlanItem {
             //Log.d("getW: loop"+i+" tmp after", "tmp="+tmp);
         }
 
-        Log.d("getW: return befor", "work="+work);
+        //Log.d("getW: return befor", "work="+work);
         return work;
     }
 
@@ -87,9 +87,9 @@ public class PlanItem {
 
     public String reviseWorks(String reviseWnames) {
         String oldWname= reviseWnames.substring(0, reviseWnames.indexOf("_"));
-        Log.d("reviseWorks: ", "oldWname="+oldWname);
+        //Log.d("reviseWorks: ", "oldWname="+oldWname);
         String newWname= reviseWnames.substring(reviseWnames.indexOf("_")+1);
-        Log.d("reviseWorks: ", "newWnames="+newWname);
+        //Log.d("reviseWorks: ", "newWnames="+newWname);
 
         if(works.contains("_"+oldWname+"_")) {
             works= works.replace("_"+oldWname+"_","_"+newWname+"_");

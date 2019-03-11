@@ -53,7 +53,7 @@ public class DayplanDialog extends Dialog {
     //Work Add
     public void buildWorkAdd() {
         LayoutInflater li= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View alertView= li.inflate(R.layout.dialog_ddworkadd, null);
+        final View alertView= li.inflate(R.layout.dialog_ddworkinput, null);
 
         EditText et_content= alertView.findViewById(R.id.et_content);
         et_content.setMovementMethod(ScrollingMovementMethod.getInstance());    //滾動效果.
@@ -72,16 +72,16 @@ public class DayplanDialog extends Dialog {
                         public void onDismiss(DialogInterface dialog) {
                             if(!df.getRcontent().equals("")) {
                                 bt_deadline.setText(df.getRcontent());
-                                Log.d("after dialog", "df.getRcontent()= "+df.getRcontent());
-                                Log.d("after dialog", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                                //Log.d("after dialog", "df.getRcontent()= "+df.getRcontent());
+                                //Log.d("after dialog", "bt.getText().toString()= "+bt_deadline.getText().toString());
                                 bt_deadline.setTag("1");
                             }
                         }
                     });
                 } else {
-                    Log.d("befor cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                    //Log.d("befor cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
                     bt_deadline.setText("");
-                    Log.d("after cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                    //Log.d("after cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
                     bt_deadline.setTag("");
                 }
             }
@@ -145,6 +145,25 @@ public class DayplanDialog extends Dialog {
         TextView tv_deadline= alertView.findViewById(R.id.tv_deadline);
         tv_deadline.setText(wi.getDeadline());
 
+        Button bt_delete= alertView.findViewById(R.id.bt_delete);
+        bt_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DayplanDialog dd= new DayplanDialog(context);
+                dd.buildWorkDelete(wi);
+                dd.show();
+                dd.setOnDismissListener(new OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if(!dd.getReturn().equals("")) {
+                            rcontent= dd.getReturn();
+                            dismiss();
+                        }
+                    }
+                });
+            }
+        });
+
         Button bt_revise= alertView.findViewById(R.id.bt_revise);
         bt_revise.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +175,7 @@ public class DayplanDialog extends Dialog {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         if(!dd.getReturn().equals("")) {
-                            rcontent= dd.getReturn();
+                            rcontent= dd.getReturn();   //包含底線.
                             dismiss();
                         }
                     }
@@ -179,7 +198,7 @@ public class DayplanDialog extends Dialog {
     //Work Revise
     public void buildWorkRevise(final WorkItem wi) {
         LayoutInflater li= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View alertView= li.inflate(R.layout.dialog_ddworkadd, null);
+        final View alertView= li.inflate(R.layout.dialog_ddworkinput, null);
 
         EditText et_name= alertView.findViewById(R.id.et_name);
         et_name.setText(wi.getName());
@@ -204,16 +223,16 @@ public class DayplanDialog extends Dialog {
                         public void onDismiss(DialogInterface dialog) {
                             if(!df.getRcontent().equals("")) {
                                 bt_deadline.setText(df.getRcontent());
-                                Log.d("after dialog", "df.getRcontent()= "+df.getRcontent());
-                                Log.d("after dialog", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                                //Log.d("after dialog", "df.getRcontent()= "+df.getRcontent());
+                                //Log.d("after dialog", "bt.getText().toString()= "+bt_deadline.getText().toString());
                                 bt_deadline.setTag("1");
                             }
                         }
                     });
                 } else {
-                    Log.d("befor cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                    //Log.d("befor cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
                     bt_deadline.setText("");
-                    Log.d("after cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
+                    //Log.d("after cancel content", "bt.getText().toString()= "+bt_deadline.getText().toString());
                     bt_deadline.setTag("");
                 }
             }
